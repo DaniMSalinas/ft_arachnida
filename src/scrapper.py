@@ -70,7 +70,7 @@ class Spiderscrapper():
                     self.logger.logger.info("downloading " + file_name + ' from ' + file)
                     urlretrieve(quote_plus(file, safe=':/'), self.path + '\\' + file_name)
                 except Exception as exc:
-                    self.logger.logger.error(exc)
+                    self.logger.logger.error(str(exc) + '. Couldn\'t download ' + file_name)
 
     def __check_and_create_directory__(self):
         """function checks and create if it's necesary a directory"""
