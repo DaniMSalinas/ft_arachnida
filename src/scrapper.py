@@ -2,6 +2,7 @@
 import os
 from urllib.request import urlretrieve
 from urllib.parse import quote_plus
+from urllib.parse import urlparse
 import urllib3
 import validators
 import requests
@@ -51,19 +52,22 @@ class Spiderscrapper():
             soup = Spiderscrapper.create_soup(request.text)
             images = soup.find_all('img')
             new_links = soup.find_all('a')
-            iframes = soup.find_all('iframe')
             self.download_files(images, 'src')
             self.download_files(new_links, 'href')
-            self.download_files(iframes, 'src')
 
     def download_files(self, items, value):
         """find all images, word and pdf files at the given URL"""
         for item in items:
-            file = item.attrs[value]
+            file = ""
+            if item.attrs:
+                file = item.attrs[value]
             if file.split('.')[-1] in self.extensions:
                 file_name = file.split('/')[-1]
-                self.logger.logger.info("downloading " + file_name + ' from ' + file)
+                if not Spiderscrapper.validate_url(file):
+                    url = urlparse(self.url)
+                    file = url.scheme + '://' + url.netloc + file
                 try:
+                    self.logger.logger.info("downloading " + file_name + ' from ' + file)
                     urlretrieve(quote_plus(file, safe=':/'), self.path + '\\' + file_name)
                 except Exception as exc:
                     self.logger.logger.error(exc)
@@ -88,7 +92,8 @@ class Spiderscrapper():
     @staticmethod
     def download_html(url):
         """get the html"""
-        request = requests.get(url, verify=False)
+        sesion = requests.Session()
+        request = sesion.get(url, headers={"User-Agent": "Mozilla/5.0"}, verify=False)
         return request
 
     @staticmethod
