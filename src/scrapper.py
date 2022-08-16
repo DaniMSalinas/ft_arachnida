@@ -1,6 +1,5 @@
 """spider module"""
 import os
-from tkinter import image_names
 from urllib.request import urlretrieve
 from urllib.parse import quote_plus
 import urllib3
