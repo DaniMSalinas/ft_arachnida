@@ -25,8 +25,6 @@ class Configlibrary:
                                 type=str, help=argparse.SUPPRESS)
         self.parser.add_argument('-rp', '--recursive-path', metavar='<URL> <PATH>', type=str,
                                 help=argparse.SUPPRESS)
-        self.parser.add_argument('-rlp', '--recursive-level-path', metavar='<URL> <LEVEL> <PATH>',
-                                type=str, help=argparse.SUPPRESS)
 
     def get_default_level(self):
         """function returns default recursive level"""

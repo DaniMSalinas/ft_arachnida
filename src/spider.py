@@ -57,7 +57,11 @@ class Spiderscrapper():
         """function checks and create if it's necesary a directory"""
         if os.path.isdir(self.path):
             return
-        os.mkdir(self.path)
+        paths = self.path.split('\\')
+        absolute_path = os.getcwd()
+        for path in paths:
+            absolute_path += '\\' + path
+            os.mkdir(absolute_path)
 
     @staticmethod
     def validate_url(url):

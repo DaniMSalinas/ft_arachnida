@@ -23,6 +23,9 @@ def main():
     if args.level and (args.recursive is None or args.recursive is False):
         scrap_logger.logger.error("argument --level requires argument --recursive")
         return
+    if (args.path or args.recursive) and args.recursive_path:
+        scrap_logger.logger.error("invalid arguments")
+        return
 
     #setting recursive level
     if args.recursive and (args.level is None or args.level is False):
@@ -33,7 +36,9 @@ def main():
         class_config["level"] = scrap_config.get_default_level()
 
     #setting path to store the downloaded files
-    if args.path:
+    if args.path or args.recursive_path:
+        if args.recursive_path:
+            args.path = args.recursive_path
         class_config["path"] = args.path
     else:
         class_config["path"] = scrap_config.get_default_path()
