@@ -2,7 +2,7 @@
 
 from src.logger import Mainlogger
 from src.config import Configlibrary
-from src.spider import Spiderscrapper
+from src.scrapper import Spiderscrapper
 
 def main():
     """main function of the program"""
@@ -50,6 +50,7 @@ def main():
         return
     spider = Spiderscrapper(args.url, class_config, scrap_logger)
     spider.run()
+    scrap_logger.logger.info("scrape finished")
 
 if __name__ == "__main__":
     main()
