@@ -9,7 +9,19 @@ def main():
     scrap_logger = Mainlogger()
     scrap_config = Configlibrary()
     class_config = {}
+
     scrap_logger.set_log_level(scrap_config.get_log_level())
+    scrap_config.parser.add_argument('url', metavar='<URL>', type=str)
+    scrap_config.parser.add_argument('-r', '--recursive', action='store_true',
+                        help="recursive images download")
+    scrap_config.parser.add_argument('-l', '--level', metavar='<N>',
+                        type=int, help="sets the downloading recursive-level")
+    scrap_config.parser.add_argument('-p', '--path', metavar='<PATH>', type=str,
+                        help="sets the path where the info downloaded is going to be saved")
+    scrap_config.parser.add_argument('-rl', '--recursive-level', metavar='<URL> <N>',
+                        type=str, help=scrap_config.argparse.SUPPRESS)
+    scrap_config.parser.add_argument('-rp', '--recursive-path', metavar='<URL> <PATH>', type=str,
+                        help=scrap_config.argparse.SUPPRESS)
 
     try:
         args, unknown = scrap_config.parser.parse_known_args()
