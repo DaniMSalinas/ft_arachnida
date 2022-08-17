@@ -49,6 +49,3 @@ class Configlibrary:
     def get_log_level(self):
         """function returns log level"""
         return self.config['log']['level']
-
-    def _validate_level(self):
-        """function validates level given as argument"""
