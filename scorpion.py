@@ -50,10 +50,9 @@ def main():
                 scorpion_logger.logger.error("invalid file extension")
 
     #printing metadata extracted from files
-    for file in args.files:
-        print("\nmetadata from: " + str(file))
-        print(metadata_dict[file])
+    for item in metadata_dict.items():
+        print("\nmetadata from: " + str(item[0]))
+        print(metadata_dict[item[1]])
 
 if __name__ == "__main__":
     main()
- 
