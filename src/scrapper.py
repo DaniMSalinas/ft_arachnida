@@ -19,6 +19,7 @@ class Spiderscrapper():
         self.extensions = class_config["extensions"]
         self.path = class_config["path"]
         self.level = int(class_config["level"])
+        self.user_agent = class_config["user_agent"]
         self.links = []
 
     def run(self):
@@ -28,39 +29,57 @@ class Spiderscrapper():
         self.logger.logger.info("recursive level: " + str(self.level))
         self.logger.logger.info("path to store: " + self.path)
         urllib3.disable_warnings()
-        self.find_links()
-        self.find_images_and_docs()
+        try:
+            self.find_links()
+            self.find_images_and_docs()
+        except Exception as exc:
+            self.logger.logger.error(str(exc))
+            return
 
     def find_links(self):
         """find links recursively"""
-        self.links.append(self.url)
-        request = Spiderscrapper.download_html(self.url)
-        soup = Spiderscrapper.create_soup(request.text)
-        links = soup.find_all('a')
-        for link in links:
-            href = link.attrs['href']
-            if href.startswith(self.url) and href not in self.links:
-                self.logger.logger.info("found " + href)
-                self.links.append(href)
-            if len(self.links) == self.level:
-                return
+        self.links.append([])
+        self.links[0].append(self.url)
+        for i in range(1, self.level):
+            self.links.append([])
+            for link in self.links[i-1]:
+                try:
+                    soup = self._soupear(link)
+                except Exception as exc:
+                    raise exc
+                links = soup.find_all('a')
+                for soup_link in links:
+                    try:
+                        href = soup_link.attrs['href']
+                        if href.startswith(self.url)\
+                            and not any([href in list for list in self.links]):
+                            self.logger.logger.info("found " + href)
+                            self.links[i].append(href)
+                    except KeyError:
+                        continue
 
     def find_images_and_docs(self):
         """download images"""
-        for link in self.links:
-            request = Spiderscrapper.download_html(link)
-            soup = Spiderscrapper.create_soup(request.text)
-            images = soup.find_all('img')
-            new_links = soup.find_all('a')
-            self.download_files(images, 'src')
-            self.download_files(new_links, 'href')
+        for link_list in self.links:
+            for link in link_list:
+                try:
+                    soup = self._soupear(link)
+                except Exception as exc:
+                    raise exc
+                images = soup.find_all('img')
+                new_links = soup.find_all('a')
+                self.download_files(images, 'src')
+                self.download_files(new_links, 'href')
 
     def download_files(self, items, value):
         """find all images, word and pdf files at the given URL"""
         for item in items:
             file = ""
             if item.attrs:
-                file = item.attrs[value]
+                try:
+                    file = item.attrs[value]
+                except KeyError:
+                    continue
             if file.split('.')[-1] in self.extensions:
                 file_name = file.split('/')[-1]
                 if not Spiderscrapper.validate_url(file):
@@ -71,6 +90,15 @@ class Spiderscrapper():
                     urlretrieve(quote_plus(file, safe=':/'), self.path + '\\' + file_name)
                 except Exception as exc:
                     self.logger.logger.error(str(exc) + '. Couldn\'t download ' + file_name)
+
+    def _soupear(self, link):
+        """function makes request and soup"""
+        try:
+            request = Spiderscrapper.download_html(link, self.user_agent)
+            soup = Spiderscrapper.create_soup(request.text)
+        except Exception as exc:
+            raise exc
+        return soup
 
     def __check_and_create_directory__(self):
         """function checks and create if it's necesary a directory"""
@@ -90,10 +118,10 @@ class Spiderscrapper():
         return False
 
     @staticmethod
-    def download_html(url):
+    def download_html(url, user_agent):
         """get the html"""
         sesion = requests.Session()
-        request = sesion.get(url, headers={"User-Agent": "Mozilla/5.0"}, verify=False)
+        request = sesion.get(url, headers={"User-Agent": user_agent}, verify=False)
         return request
 
     @staticmethod

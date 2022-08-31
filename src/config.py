@@ -39,3 +39,7 @@ class Configlibrary:
     def get_log_level(self):
         """function returns log level"""
         return self.config['log']['level']
+
+    def get_user_agent(self):
+        """function returns user agent"""
+        return self.config['program']['user-agent']

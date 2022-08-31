@@ -56,6 +56,7 @@ def main():
         class_config["path"] = scrap_config.get_default_path()
 
     class_config["extensions"] = scrap_config.get_extensions()
+    class_config["user_agent"] = scrap_config.get_user_agent()
 
     if not Spiderscrapper.validate_url(args.url):
         scrap_logger.logger.error("invalid url")
